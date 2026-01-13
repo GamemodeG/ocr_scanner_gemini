@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>document scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #E53D00;
+            --text: #000000;
+            --grid-unit: 24px;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.1;
+            min-height: 100vh;
+            padding: calc(var(--grid-unit) * 2);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 800;
+            text-transform: lowercase;
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 48px;
+            line-height: 1.0;
+            margin-bottom: calc(var(--grid-unit) * 2);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: var(--grid-unit);
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: calc(var(--grid-unit) / 2);
+        }
+
+        .container {
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--grid-unit) * 2);
+        }
+
+        .upload-section {
+            border: 2px solid var(--text);
+            padding: calc(var(--grid-unit) * 2);
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .upload-section:hover {
+            background-color: var(--text);
+            color: var(--bg);
+        }
+
+        .upload-section p {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: lowercase;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--grid-unit);
+            margin-bottom: calc(var(--grid-unit) * 2);
+            border-bottom: 2px solid var(--text);
+            padding-bottom: var(--grid-unit);
+        }
+
+        .tab {
+            padding: calc(var(--grid-unit) / 2) var(--grid-unit);
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: lowercase;
+            border: 2px solid transparent;
+        }
+
+        .tab:hover {
+            border-color: var(--text);
+        }
+
+        .tab.active {
+            background-color: var(--text);
+            color: var(--bg);
+        }
+
+        .main-content {
+            display: none;
+            gap: calc(var(--grid-unit) * 2);
+        }
+
+        .main-content.visible {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--grid-unit) * 2);
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--grid-unit);
+        }
+
+        .step-card {
+            border: 2px solid var(--text);
+            padding: var(--grid-unit);
+            text-align: left;
+        }
+
+        .step-card h3 {
+            border-bottom: 1px solid var(--text);
+            padding-bottom: calc(var(--grid-unit) / 2);
+            margin-bottom: var(--grid-unit);
+        }
+
+        .step-image-container {
+            width: 100%;
+            min-height: 120px;
+            max-height: 300px;
+            background: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .step-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .step-image-container img.loaded {
+            opacity: 1;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            border: 3px solid var(--bg);
+            border-top: 3px solid transparent;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .text-section {
+            border: 2px solid var(--text);
+            padding: calc(var(--grid-unit) * 1.5);
+        }
+
+        .text-section h2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--text);
+            padding-bottom: calc(var(--grid-unit) / 2);
+        }
+
+        .text-content {
+            background: var(--text);
+            color: var(--bg);
+            padding: var(--grid-unit);
+            min-height: 150px;
+            max-height: 350px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .text-content.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-content h1,
+        .text-content h2,
+        .text-content h3 {
+            color: var(--bg);
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .text-content h1:first-child,
+        .text-content h2:first-child,
+        .text-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .text-content ul,
+        .text-content ol {
+            padding-left: 1.5em;
+        }
+
+        .text-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        .text-content th,
+        .text-content td {
+            border: 1px solid var(--bg);
+            padding: 6px;
+            text-align: left;
+        }
+
+        .text-content code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-content pre {
+            background: var(--bg);
+            color: var(--text);
+            padding: var(--grid-unit);
+            overflow-x: auto;
+        }
+
+        .text-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--text);
+            padding: 4px 12px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: lowercase;
+        }
+
+        .copy-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .section-block {
+            margin-bottom: calc(var(--grid-unit) * 1.5);
+        }
+
+        .section-block:last-of-type {
+            margin-bottom: var(--grid-unit);
+        }
+
+        .ascii-content pre {
+            background: var(--bg);
+            color: var(--text);
+            padding: var(--grid-unit);
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.2;
+            white-space: pre;
+        }
+
+        .btn {
+            background-color: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: var(--grid-unit) calc(var(--grid-unit) * 2);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: lowercase;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--text);
+            outline: 2px solid var(--text);
+        }
+
+        @media (max-width: 800px) {
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sample-gallery {
+            border: 2px solid var(--text);
+            padding: var(--grid-unit);
+            margin-bottom: calc(var(--grid-unit) * 2);
+        }
+
+        .sample-gallery h3 {
+            margin-bottom: var(--grid-unit);
+        }
+
+        .sample-images-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: calc(var(--grid-unit) / 2);
+        }
+
+        .sample-thumb {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .sample-thumb:hover {
+            border-color: var(--text);
+        }
+
+        .sample-thumb.selected {
+            border-color: var(--text);
+            outline: 2px solid var(--text);
+            outline-offset: 2px;
+        }
+
+        .step-image-container img {
+            cursor: zoom-in;
+        }
+
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--text);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        .image-modal.visible {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--grid-unit);
+            right: calc(var(--grid-unit) * 2);
+            color: var(--bg);
+            font-size: 32px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-title {
+            position: absolute;
+            bottom: var(--grid-unit);
+            left: calc(var(--grid-unit) * 2);
+            color: var(--bg);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: lowercase;
+        }
+
+        #controls {
+            text-align: left;
+        }
+
+        #statusText {
+            font-weight: 700;
+            text-transform: lowercase;
+        }
+
+        .placeholder-text {
+            color: var(--bg);
+            opacity: 0.7;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>document<br>scanner + ocr</h1>
+
+    <div class="container">
+        <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+            <p>nажмите или перетащите изображение для сканирования</p>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <div id="sampleGallery" class="sample-gallery" style="display: none;">
+            <h3>примеры изображений</h3>
+            <div id="sampleImagesContainer" class="sample-images-container"></div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('gemini')">gemini + nanobanana pro</div>
+            <div class="tab" onclick="switchTab('opencv')">opencv (classic)</div>
+        </div>
+
+        <div id="controls" style="display: none; margin-bottom: var(--grid-unit);">
+            <p id="statusText">изображение загружено. готово к обработке.</p>
+        </div>
+
+        <div id="mainContent" class="main-content">
+            <div class="steps-container">
+                <div class="step-card">
+                    <h3>1. оригинал</h3>
+                    <div class="step-image-container">
+                        <img id="imgStep1" src="" alt="Original" onclick="openModal(this, 'оригинал')">
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3>2. обнаружение контура</h3>
+                    <div class="step-image-container">
+                        <div class="loading-spinner" id="loader2"></div>
+                        <img id="imgStep2" src="" alt="Contour" onclick="openModal(this, 'обнаружение контура')">
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3>3. финальный результат</h3>
+                    <div class="step-image-container">
+                        <div class="loading-spinner" id="loader3"></div>
+                        <img id="imgStep3" src="" alt="Scanned" onclick="openModal(this, 'финальный результат')">
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3>4. все этапы обработки</h3>
+                    <div class="step-image-container" style="min-height: 150px; max-height: 400px;">
+                        <div class="loading-spinner" id="loaderGrid"></div>
+                        <img id="imgAllStages" src="" alt="All Stages Grid"
+                            onclick="openModal(this, 'все этапы обработки')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemini OCR Section -->
+            <div id="geminiSection" class="text-section">
+                <div class="section-block">
+                    <h2>
+                        <span>ascii представление</span>
+                        <button class="copy-btn" onclick="copySection('ascii')">copy</button>
+                    </h2>
+                    <div id="asciiContent" class="text-content ascii-content">
+                        <p class="placeholder-text">ascii представление будет здесь...</p>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2>
+                        <span>markdown текст</span>
+                        <button class="copy-btn" onclick="copySection('markdown')">copy</button>
+                    </h2>
+                    <div id="markdownContent" class="text-content">
+                        <p class="placeholder-text">текст будет здесь...</p>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2>
+                        <span>описание изображения</span>
+                        <button class="copy-btn" onclick="copySection('description')">copy</button>
+                    </h2>
+                    <div id="descriptionContent" class="text-content">
+                        <p class="placeholder-text">описание будет здесь...</p>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2>
+                        <span>seo ключевые слова</span>
+                        <button class="copy-btn" onclick="copySection('seo')">copy</button>
+                    </h2>
+                    <div id="seoContent" class="text-content seo-content">
+                        <p class="placeholder-text">теги и ключевые слова будут здесь...</p>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="copyAll()" style="width: 100%;">копировать всё</button>
+            </div>
+
+
+            <!-- OpenCV Section (no OCR) -->
+            <div id="opencvSection" class="text-section" style="display: none;">
+                <div class="section-block">
+                    <h2>
+                        <span>opencv детекция</span>
+                    </h2>
+                    <div class="text-content">
+                        <p>opencv используется только для детекции контуров документа.</p>
+                        <p>ocr недоступен в режиме opencv.</p>
+                        <p style="margin-top: 1em;"><strong>для извлечения текста используйте:</strong></p>
+                        <ul style="padding-left: 1.5em; margin-top: 0.5em;">
+                            <li>gemini (ai) — облачный AI OCR</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="image-modal" onclick="closeModal()">
+        <span class="modal-close" onclick="closeModal()">x</span>
+        <img id="modalImage" src="" alt="Enlarged view">
+        <div class="modal-title" id="modalTitle"></div>
+    </div>
+
+    <script>
+        let currentTab = 'gemini';
+        let originalImagePath = null;
+        let originalServePath = null;  // For displaying sample images
+        let extractedData = {
+            ascii_diagram: '',
+            markdown_text: '',
+            description: '',
+            seo_keywords: ''
+        };
+        // Кэш для результатов обработки и OCR
+        let imageCache = {
+            opencv: {},
+            gemini: {},
+            text: {}         // Gemini OCR кэш
+        };
+
+        // Modal functions for image viewing
+        function openModal(imgElement, title) {
+            if (!imgElement.src || imgElement.src === window.location.href) return;
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+
+            modalImg.src = imgElement.src;
+            modalTitle.textContent = title || '';
+            modal.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tabName));
+            if (activeTab) activeTab.classList.add('active');
+
+            // Переключаем секции OCR
+            document.getElementById('geminiSection').style.display = tabName === 'gemini' ? 'block' : 'none';
+            document.getElementById('opencvSection').style.display = tabName === 'opencv' ? 'block' : 'none';
+
+            // Если нет изображения — ничего не делаем
+            if (!originalImagePath) return;
+
+            // Восстанавливаем оригинальное изображение (step1) при переключении
+            const img1 = document.getElementById('imgStep1');
+            if (!img1.src || !img1.classList.contains('loaded')) {
+                const displayPath = originalServePath || originalImagePath;
+                img1.src = displayPath;
+                img1.onload = () => img1.classList.add('loaded');
+            }
+
+            // Проверяем кэш для результатов обработки
+            if (imageCache[tabName][originalImagePath]) {
+                // Используем кэш
+                displayProcessingResults(imageCache[tabName][originalImagePath]);
+            } else {
+                // Обрабатываем заново
+                processImage(originalImagePath);
+            }
+
+            // Запускаем OCR (функции сами проверят кэш)
+            if (tabName === 'gemini') {
+                extractText(originalImagePath);
+            }
+        }
+
+
+        // Load sample images on page start
+        function loadSampleImages() {
+            fetch('/sample_images')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.images && data.images.length > 0) {
+                        const gallery = document.getElementById('sampleGallery');
+                        const container = document.getElementById('sampleImagesContainer');
+                        gallery.style.display = 'block';
+
+                        container.innerHTML = data.images.map(img =>
+                            `<img src="${img.path}" class="sample-thumb" 
+                                  onclick="selectSample('${img.path}')" 
+                                  title="${img.name}" alt="${img.name}">`
+                        ).join('');
+                    }
+                })
+                .catch(err => console.error('Could not load samples:', err));
+        }
+
+        // Load samples on page load
+        loadSampleImages();
+
+        // Select and process a sample image
+        function selectSample(servePath) {
+            // Clear previous selection
+            document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            // Reset and show UI
+            resetAll();
+            document.getElementById('mainContent').classList.add('visible');
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('statusText').innerText = "обработка изображения...";
+
+            originalImagePath = servePath;  // Server will resolve this path
+            originalServePath = servePath;  // For display
+
+            // Show original image
+            document.getElementById('imgStep1').src = servePath;
+            document.getElementById('imgStep1').onload = () => document.getElementById('imgStep1').classList.add('loaded');
+
+            // Process with current tab
+            processImage(servePath);
+
+            // Extract text with Gemini if on Gemini tab
+            if (currentTab === 'gemini') {
+                extractText(servePath);
+            }
+        }
+
+        // Load samples on page load
+        loadSampleImages();
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('mainContent').classList.add('visible');
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('statusText').innerText = "загрузка...";
+
+            resetAll();
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    originalImagePath = data.path;
+                    document.getElementById('statusText').innerText = "обработка...";
+
+                    document.getElementById('imgStep1').src = data.path;
+                    document.getElementById('imgStep1').onload = () => document.getElementById('imgStep1').classList.add('loaded');
+
+                    processImage(data.path);
+
+                    // Also extract text with Gemini
+                    if (currentTab === 'gemini') {
+                        extractText(data.path);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Upload failed.");
+                });
+        }
+
+        function processImage(path) {
+            let endpoint;
+            if (currentTab === 'gemini') {
+                endpoint = '/process_gemini';
+            } else {
+                endpoint = '/process_opencv';
+            }
+
+            document.getElementById('loader2').style.display = 'block';
+            document.getElementById('loader3').style.display = 'block';
+            document.getElementById('loaderGrid').style.display = 'block';
+            document.getElementById('imgStep2').classList.remove('loaded');
+            document.getElementById('imgStep3').classList.remove('loaded');
+            document.getElementById('imgAllStages').classList.remove('loaded');
+
+            let tabLabel = currentTab === 'gemini' ? 'gemini ai' : 'opencv';
+            document.getElementById('statusText').innerText = `обработка с ${tabLabel}...`;
+
+            const formData = new FormData();
+            formData.append('path', path);
+
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("ошибка: " + data.error);
+                        document.getElementById('statusText').innerText = "произошла ошибка.";
+                        document.getElementById('loader2').style.display = 'none';
+                        document.getElementById('loader3').style.display = 'none';
+                        document.getElementById('loaderGrid').style.display = 'none';
+                        return;
+                    }
+
+                    // Cache the results
+                    imageCache[currentTab][path] = data;
+
+                    // Display results
+                    displayProcessingResults(data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Processing failed.");
+                    document.getElementById('loader2').style.display = 'none';
+                    document.getElementById('loader3').style.display = 'none';
+                });
+        }
+
+        function displayProcessingResults(data) {
+            const img2 = document.getElementById('imgStep2');
+            img2.src = data.step2 + '?t=' + new Date().getTime();
+            img2.onload = () => {
+                img2.classList.add('loaded');
+                document.getElementById('loader2').style.display = 'none';
+            };
+
+            const img3 = document.getElementById('imgStep3');
+            img3.src = data.step3 + '?t=' + new Date().getTime();
+            img3.onload = () => {
+                img3.classList.add('loaded');
+                document.getElementById('loader3').style.display = 'none';
+            };
+
+            // Load all stages grid
+            if (data.all_stages) {
+                const imgGrid = document.getElementById('imgAllStages');
+                imgGrid.src = data.all_stages + '?t=' + new Date().getTime();
+                imgGrid.onload = () => {
+                    imgGrid.classList.add('loaded');
+                    document.getElementById('loaderGrid').style.display = 'none';
+                };
+            }
+
+            document.getElementById('statusText').innerText = "обработка завершена";
+        }
+
+        function extractText(path) {
+            // Проверяем кэш
+            if (imageCache.text[path]) {
+                displayGeminiText(imageCache.text[path]);
+                return;
+            }
+
+            const asciiContent = document.getElementById('asciiContent');
+            const markdownContent = document.getElementById('markdownContent');
+            const descriptionContent = document.getElementById('descriptionContent');
+            const seoContent = document.getElementById('seoContent');
+
+            const loadingHtml = '<div class="loading-spinner" style="display: block;"></div><p>извлечение с gemini ai...</p>';
+            asciiContent.innerHTML = loadingHtml;
+            markdownContent.innerHTML = loadingHtml;
+            descriptionContent.innerHTML = loadingHtml;
+            seoContent.innerHTML = loadingHtml;
+            asciiContent.classList.add('loading');
+            markdownContent.classList.add('loading');
+            descriptionContent.classList.add('loading');
+            seoContent.classList.add('loading');
+
+            const formData = new FormData();
+            formData.append('path', path);
+
+            fetch('/extract_text', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    asciiContent.classList.remove('loading');
+                    markdownContent.classList.remove('loading');
+                    descriptionContent.classList.remove('loading');
+                    seoContent.classList.remove('loading');
+
+                    if (data.error) {
+                        const errorHtml = '<p class="placeholder-text">error: ' + data.error + '</p>';
+                        asciiContent.innerHTML = errorHtml;
+                        markdownContent.innerHTML = errorHtml;
+                        descriptionContent.innerHTML = errorHtml;
+                        seoContent.innerHTML = errorHtml;
+                        return;
+                    }
+
+                    // Сохраняем в кэш
+                    imageCache.text[path] = data;
+                    displayGeminiText(data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    const errorHtml = '<p class="placeholder-text">ошибка извлечения</p>';
+                    asciiContent.classList.remove('loading');
+                    markdownContent.classList.remove('loading');
+                    descriptionContent.classList.remove('loading');
+                    seoContent.classList.remove('loading');
+                    asciiContent.innerHTML = errorHtml;
+                    markdownContent.innerHTML = errorHtml;
+                    descriptionContent.innerHTML = errorHtml;
+                    seoContent.innerHTML = errorHtml;
+                });
+        }
+
+        // Отображение данных Gemini OCR
+        function displayGeminiText(data) {
+            const asciiContent = document.getElementById('asciiContent');
+            const markdownContent = document.getElementById('markdownContent');
+            const descriptionContent = document.getElementById('descriptionContent');
+            const seoContent = document.getElementById('seoContent');
+
+            extractedData.ascii_diagram = data.ascii_diagram || '';
+            extractedData.markdown_text = data.markdown_text || '';
+            extractedData.description = data.description || '';
+            extractedData.seo_keywords = data.seo_keywords || '';
+
+            asciiContent.innerHTML = extractedData.ascii_diagram
+                ? '<pre><code>' + escapeHtml(extractedData.ascii_diagram) + '</code></pre>'
+                : '<p class="placeholder-text">схемы не найдены</p>';
+
+            markdownContent.innerHTML = extractedData.markdown_text
+                ? marked.parse(extractedData.markdown_text)
+                : '<p class="placeholder-text">текст не найден</p>';
+
+            descriptionContent.innerHTML = extractedData.description
+                ? marked.parse(extractedData.description)
+                : '<p class="placeholder-text">описание не найдено</p>';
+
+            seoContent.innerHTML = extractedData.seo_keywords
+                ? marked.parse(extractedData.seo_keywords)
+                : '<p class="placeholder-text">seo данные не найдены</p>';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copySection(section) {
+            let text = '';
+            if (section === 'ascii') {
+                text = extractedData.ascii_diagram;
+            } else if (section === 'markdown') {
+                text = extractedData.markdown_text;
+            } else if (section === 'description') {
+                text = extractedData.description;
+            } else if (section === 'seo') {
+                text = extractedData.seo_keywords;
+            }
+
+            if (!text) {
+                alert('нет данных для копирования');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('скопировано');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function copyAll() {
+            const allText = `## ASCII Представление\n\n\`\`\`\n${extractedData.ascii_diagram}\n\`\`\`\n\n---\n\n## Текст\n\n${extractedData.markdown_text}\n\n---\n\n## Описание\n\n${extractedData.description}\n\n---\n\n## SEO Ключевые слова\n\n${extractedData.seo_keywords}`;
+            navigator.clipboard.writeText(allText).then(() => {
+                alert('всё скопировано');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function resetAll() {
+            document.getElementById('imgStep1').src = '';
+            document.getElementById('imgStep2').src = '';
+            document.getElementById('imgStep3').src = '';
+            document.getElementById('imgAllStages').src = '';
+            document.getElementById('imgStep1').classList.remove('loaded');
+            document.getElementById('imgStep2').classList.remove('loaded');
+            document.getElementById('imgStep3').classList.remove('loaded');
+            document.getElementById('imgAllStages').classList.remove('loaded');
+            document.getElementById('loader2').style.display = 'none';
+            document.getElementById('loader3').style.display = 'none';
+            document.getElementById('loaderGrid').style.display = 'none';
+            document.getElementById('asciiContent').innerHTML = '<p class="placeholder-text">ascii представление будет здесь...</p>';
+            document.getElementById('markdownContent').innerHTML = '<p class="placeholder-text">текст будет здесь...</p>';
+            document.getElementById('descriptionContent').innerHTML = '<p class="placeholder-text">описание будет здесь...</p>';
+            document.getElementById('seoContent').innerHTML = '<p class="placeholder-text">теги и ключевые слова будут здесь...</p>';
+            extractedData = { ascii_diagram: '', markdown_text: '', description: '', seo_keywords: '' };
+            originalImagePath = null;
+            originalServePath = null;
+        }
+    </script>
+</body>
+
+</html>

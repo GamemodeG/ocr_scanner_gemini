@@ -1,0 +1,5 @@
+flask>=3.0
+opencv-python>=4.10
+google-genai
+pillow
+numpy

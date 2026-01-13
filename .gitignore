@@ -1,0 +1,9 @@
+*.pyc
+.DS_Store
+config.py
+output/
+__pycache__/
+venv/
+.claude/
+static/uploads/
+static/processed/

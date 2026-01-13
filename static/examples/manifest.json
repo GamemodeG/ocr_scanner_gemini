@@ -1,0 +1,94 @@
+{
+  "examples": [
+    {
+      "id": "IMG_1879",
+      "name": "Example 1",
+      "thumbnail": "static/examples/IMG_1879_thumb.jpg",
+      "original": "static/examples/IMG_1879_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_1879_step2_opencv.jpg",
+        "step3": "static/examples/IMG_1879_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": null,
+        "step3": null
+      },
+      "text": "# POWER MAN MODEL NO(型號): IP-P300AJ2-0\n\nwitching Power Supply 交換式電源供應器 300W OUTPUT\n\n|                  |                  |                  |                  |                  |                  |\n| :--------------- | :--------------- | :--------------- | :--------------- | :--------------- | :--------------- |\n| AC INPUT 交流輸入 | 115V/230V~, 8/4A,60/50Hz |                  |                  |                  |                  |\n| DC OUTPUT        | +3.3V            | +5V             | +12V            | -5V             | -12V            |\n|                  | 28.0A            | 30.0A            | 18.0A            | 0.3A            | 0.8A            |\n| 直流輸出         | 200W             | 200W             | 216W             | 10W             | 10W             |\n\n280W\n20W\n\nWARNING (警告):\n\n- HAZARDOUS VOLTAGE CONTAINED WITHIN THIS POWER SUPPLY.\n- NOT USER SERVICEABLE RETURN SERVICE CENTER FOR REPAIR.\n-內有危險電壓請勿打開機殼!-選擇正確的輸入電壓值!\n\nMADE IN CHINA\n\nINSPIRED BY IN WIN IN-C"
+    },
+    {
+      "id": "IMG_2017",
+      "name": "Example 2",
+      "thumbnail": "static/examples/IMG_2017_thumb.jpg",
+      "original": "static/examples/IMG_2017_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_2017_step2_opencv.jpg",
+        "step3": "static/examples/IMG_2017_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": null,
+        "step3": null
+      },
+      "text": "# DORAYAKI\nэто традиционные японские, воздушные бисквиты,\nизвестные во всём мире\n\n*   ✓ Без консервантов\n*   ✓ Без усилителей вкуса\n*   Без ароматизаторов\n*   С Любовью\n\nNutella - легендарная шоколадно-ореховая паста,\nлюбимое лакомство взрослых и детей\n\"Чем был бы мир без Нутеллы?\"\n\nКонтакты: ✉ dorayakikrd@gmail.com\n➿ +79676565987"
+    },
+    {
+      "id": "IMG_2018",
+      "name": "Example 3",
+      "thumbnail": "static/examples/IMG_2018_thumb.jpg",
+      "original": "static/examples/IMG_2018_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_2018_step2_opencv.jpg",
+        "step3": "static/examples/IMG_2018_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": "static/examples/IMG_2018_step2_gemini.jpg",
+        "step3": "static/examples/IMG_2018_step3_gemini.jpg"
+      },
+      "text": "```markdown\n# DORAYAKI\n**nutella**\n```"
+    },
+    {
+      "id": "IMG_2408",
+      "name": "Example 4",
+      "thumbnail": "static/examples/IMG_2408_thumb.jpg",
+      "original": "static/examples/IMG_2408_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_2408_step2_opencv.jpg",
+        "step3": "static/examples/IMG_2408_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": "static/examples/IMG_2408_step2_gemini.jpg",
+        "step3": "static/examples/IMG_2408_step3_gemini.jpg"
+      },
+      "text": "# МУКУ МАСНАВКА\n\nЗакажите красоту с доставкой\n\n# PINK50\n\n-50% скидка на первый заказ\n\n# PINK35\n\n-35% скидка на повторный заказ\n\nПо промокоду «**PINK50**» с 01.12.2025 по 31.12.2025 предоставляется скидка 50% на первый заказ от 700 руб. в разделе «Косметика в приложении «Магнит: акции и доставка» (6+) в г. Краснодар. Скидка применяется на общую стоимость товаров в корзине, не может превышать 700 руб., не действует на товары с плашкой «Финальная цена». Промокод действует только в формате «Косметики.\nПо промокоду «**PINK35**» с 01.12.2025 по 31.12.2025 предоставляется скидка 35% на заказ от 1800 руб. в разделе «косметики» в приложении «Магнит: акции и доставка» (6+) в г. Краснодар. Скидка применяется на общую стоимость товаров в корзине, не может превышать 10000 руб.\nне действует на товары с плашкой «Финальная ценам. Промокод действует только в формате «Косметики.\nАО «Тандер», ОГРН 1022301558549, г. Краснодар, ул. Леваневского, 185.\n"
+    },
+    {
+      "id": "IMG_2482",
+      "name": "Example 5",
+      "thumbnail": "static/examples/IMG_2482_thumb.jpg",
+      "original": "static/examples/IMG_2482_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_2482_step2_opencv.jpg",
+        "step3": "static/examples/IMG_2482_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": null,
+        "step3": null
+      },
+      "text": "# Document Analysis\n\n## Student ID Information\n\nМИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ\nРОССИЙСКОЙ ФЕДЕРАЦИИ\nФедеральное государственное бюджетное\nобразовательное учреждение\nвысшего образования\n\"Кубанский государственный университет\"\nФакультет компьютерных технологий и\nприкладной математики\n\nСТУДЕНЧЕСКИЙ БИЛЕТ № 387-ПМ-25\nСЕРТИФИКА\nФедеральное гос\nбразовательное\n**ФГБОУ ВО Куба\n*\nЗачислен приказом от 30.08.2025г. №2888-CT\nДата выдачи «01» Сентября 2025 г.\n\nРектор:\nАстапов М.Б.\n\n## Official Stamps and Signatures\n\n**М.П.**\n**Ректор**\n\n## Information fields on the right column (Unfinished)\n\nДейств\nДекан/\nМ.П.\n\nДейств\nДекан/\nМ.П.\n\nДейстE\nДекан/\nМ.П.\n\nДейст\nДекан\nМ.П.\n\nДейст\nДекан\nМ.П.\n\nДейст\nДекан\nМ.П.\n"
+    },
+    {
+      "id": "IMG_2483",
+      "name": "Example 6",
+      "thumbnail": "static/examples/IMG_2483_thumb.jpg",
+      "original": "static/examples/IMG_2483_original.jpg",
+      "opencv": {
+        "step2": "static/examples/IMG_2483_step2_opencv.jpg",
+        "step3": "static/examples/IMG_2483_step3_opencv.jpg"
+      },
+      "gemini": {
+        "step2": "static/examples/IMG_2483_step2_gemini.jpg",
+        "step3": "static/examples/IMG_2483_step3_gemini.jpg"
+      },
+      "text": "```markdown\n# Russian Banknote\n\n*   **500**\n*   БАНК РОССИИ\n*   TX 0701392\n\n*   ПОДДЕЛКА\n*   БИЛЕТОВ\n*   БАНКА РОССИИ\n*   ПРЕСЛЕДУЕТСЯ\n*   ПО ЗАКОНУ\n\n*   БИЛЕТ БАНКА РОССИИ\n*   TX 0701392\n\n*   АРХАНГЕЛЬСК\n*   ПЯТЬСОТ РУБЛЕЙ\n\n*   500 500 500\n```"
+    }
+  ]
+}
