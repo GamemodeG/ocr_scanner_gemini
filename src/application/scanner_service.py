@@ -65,6 +65,14 @@ class DocumentScannerService:
         # Resolve path if it's a serve path
         actual_path = self._file_manager.resolve_serve_path(image_path)
         
+        # Check cache first
+        cached_data = self._file_manager.get_cache(actual_path, suffix="_proc")
+        if cached_data:
+            # Verify that cached files actually exist
+            if (self._file_manager.file_exists(cached_data.get('step3', '')) and 
+                self._file_manager.file_exists(cached_data.get('all_stages', ''))):
+                return ProcessingResult.from_dict(cached_data)
+        
         # Load original image
         image = self._processor.load(actual_path)
         original = image.copy()
@@ -168,7 +176,7 @@ class DocumentScannerService:
         # Determine method used
         method = ProcessingMethod.GEMINI if "Gemini" in self._detector.name else ProcessingMethod.OPENCV
         
-        return ProcessingResult(
+        result = ProcessingResult(
             original_path=stages['1_original'],
             contour_path=stages['6_contour'],
             scanned_path=stages['scanned'],
@@ -188,6 +196,11 @@ class DocumentScannerService:
             },
             method=method
         )
+        
+        # Save to cache
+        self._file_manager.save_cache(actual_path, result.to_dict(), suffix="_proc")
+        
+        return result
     
     def _save_stage(self, image, timestamp: str, stage_name: str) -> str:
         """Save processing stage image and return path."""

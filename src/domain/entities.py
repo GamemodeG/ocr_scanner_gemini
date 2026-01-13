@@ -114,8 +114,21 @@ class ProcessingResult:
             "step2": self.contour_path,
             "step3": self.scanned_path,
             "all_stages": self.all_stages_path,
-            "stages": self.stages
+            "stages": self.stages,
+            "method": self.method.value
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ProcessingResult":
+        """Create from dictionary."""
+        return cls(
+            original_path=data.get("step1", ""),
+            contour_path=data.get("step2", ""),
+            scanned_path=data.get("step3", ""),
+            all_stages_path=data.get("all_stages", ""),
+            stages=data.get("stages", {}),
+            method=ProcessingMethod(data.get("method", "opencv"))
+        )
 
 
 @dataclass

@@ -51,7 +51,7 @@ class TextExtractionService:
             return None
         
         # Check cache first
-        cached_data = self._file_manager.get_ocr_cache(actual_path)
+        cached_data = self._file_manager.get_cache(actual_path, suffix="_ocr")
         if cached_data:
             return TextExtractionResult(
                 ascii_diagram=cached_data.get('ascii_diagram', ''),
@@ -63,9 +63,9 @@ class TextExtractionService:
         # Delegate to extractor
         result = self._extractor.extract(actual_path)
         
-        # Save to cache if successful
-        if result:
-            self._file_manager.save_ocr_cache(actual_path, result.to_dict())
+        # Save to cache if successful and has data
+        if result and (result.ascii_diagram or result.markdown_text or result.description or result.seo_keywords):
+            self._file_manager.save_cache(actual_path, result.to_dict(), suffix="_ocr")
             
         return result
     

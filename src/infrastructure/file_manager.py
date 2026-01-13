@@ -79,7 +79,15 @@ class FileManager:
         Returns:
             Actual file system path
         """
-        if serve_path and serve_path.startswith('/sample_images_serve/'):
+        import urllib.parse
+        
+        if not serve_path:
+            return serve_path
+            
+        # Decode URL encoding (e.g. %20 -> space)
+        serve_path = urllib.parse.unquote(serve_path)
+        
+        if serve_path.startswith('/sample_images_serve/'):
             filename = serve_path.replace('/sample_images_serve/', '')
             return self.get_sample_path(filename)
         return serve_path
@@ -138,24 +146,24 @@ class FileManager:
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
 
-    def get_cache_path(self, file_hash: str) -> str:
-        """Get path to cache file based on hash."""
-        return os.path.join(self.processed_folder, f"{file_hash}.json")
+    def get_cache_path(self, file_hash: str, suffix: str = "_ocr") -> str:
+        """Get path to cache file based on hash and suffix."""
+        return os.path.join(self.processed_folder, f"{file_hash}{suffix}.json")
 
-    def save_ocr_cache(self, filepath: str, data: dict) -> None:
-        """Save OCR result to cache file."""
+    def save_cache(self, filepath: str, data: dict, suffix: str = "_ocr") -> None:
+        """Save result to cache file."""
         import json
         file_hash = self.calculate_md5(filepath)
-        cache_path = self.get_cache_path(file_hash)
+        cache_path = self.get_cache_path(file_hash, suffix)
         with open(cache_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-    def get_ocr_cache(self, filepath: str) -> Optional[dict]:
-        """Get OCR result from cache if exists."""
+    def get_cache(self, filepath: str, suffix: str = "_ocr") -> Optional[dict]:
+        """Get result from cache if exists."""
         import json
         try:
             file_hash = self.calculate_md5(filepath)
-            cache_path = self.get_cache_path(file_hash)
+            cache_path = self.get_cache_path(file_hash, suffix)
             if os.path.exists(cache_path):
                 with open(cache_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
