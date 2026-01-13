@@ -1,0 +1,20 @@
+{
+  "step1": "static/processed/20260114012219653676_1_original.jpg",
+  "step2": "static/processed/20260114012219653676_6_contour.jpg",
+  "step3": "static/processed/20260114012219653676_scanned.jpg",
+  "all_stages": "static/processed/20260114012219653676_ALL_STAGES.jpg",
+  "stages": {
+    "original": "static/processed/20260114012219653676_1_original.jpg",
+    "grayscale": "static/processed/20260114012219653676_2_grayscale.jpg",
+    "blurred": "static/processed/20260114012219653676_3_blurred.jpg",
+    "edges": "static/processed/20260114012219653676_4_edges.jpg",
+    "morphology": "static/processed/20260114012219653676_5_morphology.jpg",
+    "contour": "static/processed/20260114012219653676_6_contour.jpg",
+    "warped": "static/processed/20260114012219653676_7_warped.jpg",
+    "sharpened": "static/processed/20260114012219653676_8_sharpened.jpg",
+    "binary": "static/processed/20260114012219653676_9_binary.jpg",
+    "scanned": "static/processed/20260114012219653676_scanned.jpg",
+    "all_stages": "static/processed/20260114012219653676_ALL_STAGES.jpg"
+  },
+  "method": "gemini"
+}

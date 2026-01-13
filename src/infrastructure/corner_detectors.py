@@ -209,6 +209,7 @@ class GeminiCornerDetector(ICornerDetector):
         """
         from google.genai import types
         from PIL import Image
+        import os
         
         try:
             client = self._get_client()
@@ -223,16 +224,10 @@ class GeminiCornerDetector(ICornerDetector):
             image_bytes = buffered.getvalue()
             
             # Промпт для генерации изображения с точками
-            prompt = """Определи 4 угла объекта с текстом (бумажного документа/листа) на этом фото и нарисуй на них маленькие яркие зелёные точки-маркеры.
-
-ВАЖНО:
-- Точки должны быть ЯРКО-ЗЕЛЁНЫЕ (чистый зелёный цвет #00FF00)
-- Точки должны быть МАЛЕНЬКИЕ (5-10 пикселей) и ЧЁТКИЕ
-- Точки должны находиться ТОЧНО на углах бумаги/документа
-- НЕ изменяй остальную часть изображения
-- Рисуй ровно 4 точки — по одной на каждый угол документа
-
-Верни изображение с нарисованными зелёными точками на углах."""
+            prompt = """Найди углы на этом фото для скана, тебе нужно как бы определить, где лист, смотри внимательно.
+Найди РОВНО 4 угла (иногда углы могут уходить за края, поэтому рисуй их у края).
+Нарисуй яркую ЗЕЛЁНУЮ точку (#00FF00) на КАЖДОМ из 4 углов.
+Нарисуй КРАСНУЮ линию (#FF0000), соединяющую все 4 угла (образуя прямоугольник/четырёхугольник)."""
             
             # Создаём Part для изображения
             image_part = types.Part.from_bytes(
@@ -261,11 +256,20 @@ class GeminiCornerDetector(ICornerDetector):
                 print("Gemini не вернул изображение")
                 return None
             
+            # Сохраняем сгенерированное изображение для отладки
+            debug_dir = "static/processed"
+            os.makedirs(debug_dir, exist_ok=True)
+            debug_path = os.path.join(debug_dir, "DEBUG_gemini_corners.jpg")
+            generated_image.save(debug_path, quality=95)
+            print(f"DEBUG: Сохранено изображение с точками -> {debug_path}")
+            
             # Получаем размеры сгенерированного изображения
             gen_width, gen_height = generated_image.size
             
             # Находим зелёные точки на сгенерированном изображении
             green_points = self._find_green_points(generated_image)
+            
+            print(f"DEBUG: Найдено {len(green_points)} зелёных точек")
             
             if len(green_points) != 4:
                 print(f"Найдено {len(green_points)} точек вместо 4")
@@ -298,61 +302,55 @@ class GeminiCornerDetector(ICornerDetector):
     
     def _find_green_points(self, image: "Image.Image") -> list[tuple[int, int]]:
         """
-        Находит ярко-зелёные точки на изображении через HSV фильтрацию.
-        
-        Args:
-            image: PIL Image с нарисованными зелёными точками
-            
-        Returns:
-            Список координат (x, y) найденных точек
+        Находит зелёные точки на изображении.
+        Простой алгоритм: HSV фильтрация по зелёному цвету.
         """
+        import os
+        
         # Конвертируем PIL в OpenCV формат (BGR)
         img_array = np.array(image)
         if len(img_array.shape) == 2:
-            # Grayscale
             img_bgr = cv2.cvtColor(img_array, cv2.COLOR_GRAY2BGR)
         elif img_array.shape[2] == 4:
-            # RGBA
             img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGBA2BGR)
         else:
-            # RGB
             img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
         
-        # Конвертируем в HSV для поиска зелёного цвета
+        # Конвертируем в HSV
         hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
         
-        # Диапазон для ярко-зелёного цвета в HSV
-        # Зелёный: H=60° (в OpenCV 0-180, так что 60/2=30), но берём диапазон 35-85
-        lower_green = np.array([35, 100, 100])
+        # Узкий диапазон для ярко-зелёного (#00FF00)
+        # H=60° в HSV (в OpenCV = 60/2 = 30), берём узкий диапазон 30-90
+        lower_green = np.array([35, 150, 150])
         upper_green = np.array([85, 255, 255])
         
-        # Создаём маску для зелёного цвета
         mask = cv2.inRange(hsv, lower_green, upper_green)
         
-        # Морфологические операции для очистки маски
-        kernel = np.ones((3, 3), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        # Сохраняем маску для отладки
+        debug_mask_path = "static/processed/DEBUG_green_mask.jpg"
+        cv2.imwrite(debug_mask_path, mask)
+        print(f"DEBUG: Сохранена маска зелёного -> {debug_mask_path}")
         
-        # Находим контуры зелёных областей
+        # Находим контуры
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        print(f"DEBUG: Найдено {len(contours)} зелёных контуров")
         
-        # Извлекаем центры контуров (центроиды точек)
+        # Извлекаем центры ВСЕХ контуров (без фильтрации по размеру)
         points = []
         for contour in contours:
             area = cv2.contourArea(contour)
-            # Фильтруем слишком маленькие и слишком большие области
-            if 5 < area < 5000:
-                M = cv2.moments(contour)
-                if M["m00"] > 0:
-                    cx = int(M["m10"] / M["m00"])
-                    cy = int(M["m01"] / M["m00"])
-                    points.append((cx, cy, area))
+            M = cv2.moments(contour)
+            if M["m00"] > 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                points.append((cx, cy, area))
+                print(f"DEBUG: Точка ({cx}, {cy}) площадь={area}")
         
-        # Сортируем по площади (убывание) и берём координаты
+        # Сортируем по площади и берём 4 самых крупных
         points.sort(key=lambda p: p[2], reverse=True)
-        result = [(p[0], p[1]) for p in points]
+        result = [(p[0], p[1]) for p in points[:4]]
         
+        print(f"DEBUG: Финальные 4 точки: {result}")
         return result
     
     def _order_corners(self, pts: np.ndarray) -> Corners:
