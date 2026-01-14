@@ -6,8 +6,6 @@
 
 ## 🎬 Демонстрация
 
-[![Демонстрация OCR Scanner](https://img.youtube.com/vi/yO54KFo9E1g/maxresdefault.jpg)](https://youtu.be/yO54KFo9E1g)
-
 ▶️ **[Видеобзор](https://youtu.be/yO54KFo9E1g)**
 
 ---
